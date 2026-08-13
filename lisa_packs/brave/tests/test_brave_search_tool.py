@@ -1,4 +1,4 @@
-"""Tests for the Brave provider web_search tool contract."""
+"""Tests for the Brave provider brave_search tool contract."""
 
 from __future__ import annotations
 
@@ -8,38 +8,38 @@ from kernel.models import ToolExecutionContext
 
 
 @pytest.mark.asyncio
-async def test_web_search_returns_friendly_error_when_unconfigured(
+async def test_brave_search_returns_friendly_error_when_unconfigured(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from lisa_packs.brave_search.tools.web_search import web_search as ws
+    from lisa_packs.brave.tools.brave_search import brave_search as ws
 
     monkeypatch.setattr(ws, "is_configured", lambda: False)
 
     ctx = ToolExecutionContext(
-        tool_id="web_search",
+        tool_id="brave_search",
         parameters={"query": "cloud cost"},
     )
     result = await ws.execute(ctx)
 
-    assert result.error == "Web search is not configured. Set WEB_SEARCH_API_KEY to enable it."
+    assert result.error == "Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it."
 
 
 @pytest.mark.asyncio
-async def test_web_search_returns_error_on_empty_query() -> None:
-    from lisa_packs.brave_search.tools.web_search import web_search as ws
+async def test_brave_search_returns_error_on_empty_query() -> None:
+    from lisa_packs.brave.tools.brave_search import brave_search as ws
 
-    ctx = ToolExecutionContext(tool_id="web_search", parameters={})
+    ctx = ToolExecutionContext(tool_id="brave_search", parameters={})
     result = await ws.execute(ctx)
 
-    assert result.error == "web_search requires a query."
+    assert result.error == "brave_search requires a query."
 
 
 @pytest.mark.asyncio
-async def test_web_search_returns_grounded_payload_when_configured(
+async def test_brave_search_returns_grounded_payload_when_configured(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    from lisa_packs.brave_search.models import WebSearchResponse, WebSearchResult
-    from lisa_packs.brave_search.tools.web_search import web_search as ws
+    from lisa_packs.brave.models import WebSearchResponse, WebSearchResult
+    from lisa_packs.brave.tools.brave_search import brave_search as ws
 
     async def _fake_search(query: str) -> WebSearchResponse:
         return WebSearchResponse(
@@ -59,7 +59,7 @@ async def test_web_search_returns_grounded_payload_when_configured(
     monkeypatch.setattr(ws, "search", _fake_search)
 
     ctx = ToolExecutionContext(
-        tool_id="web_search",
+        tool_id="brave_search",
         parameters={"query": "cloud cost"},
     )
     result = await ws.execute(ctx)

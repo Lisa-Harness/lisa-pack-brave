@@ -1,4 +1,4 @@
-"""External Brave web search provider pack for Lisa."""
+"""External Brave search provider pack for Lisa."""
 
 from __future__ import annotations
 

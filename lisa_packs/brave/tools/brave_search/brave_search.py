@@ -1,4 +1,4 @@
-"""Brave Web Search tool provider for the generic web_search contract."""
+"""Brave Search tool provider for the brave_search contract."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ import httpx
 from pydantic import BaseModel, Field
 
 from kernel.models import ToolExecutionContext, ToolResult
-from lisa_packs.brave_search.models import WebSearchResponse, WebSearchResult
+from lisa_packs.brave.models import WebSearchResponse, WebSearchResult
 
 __all__ = ["Parameters", "execute", "is_configured", "search"]
 
@@ -20,22 +20,22 @@ _SEARCH_TIMEOUT_SECONDS: float = 10.0
 
 
 class Parameters(BaseModel):
-    """Structured input parameters for the web_search tool."""
+    """Structured input parameters for the brave_search tool."""
 
     query: str = Field(..., description="The search query to execute.")
     count: int = Field(default=5, ge=1, le=20, description="Max results per query.")
 
 
 def _get_api_key() -> str:
-    return os.environ.get("WEB_SEARCH_API_KEY", "").strip()
+    return os.environ.get("BRAVE_SEARCH_API_KEY", "").strip()
 
 
 def _get_endpoint() -> str:
-    return os.environ.get("WEB_SEARCH_ENDPOINT", _DEFAULT_ENDPOINT).strip() or _DEFAULT_ENDPOINT
+    return os.environ.get("BRAVE_SEARCH_ENDPOINT", _DEFAULT_ENDPOINT).strip() or _DEFAULT_ENDPOINT
 
 
 def _get_count() -> int:
-    raw = os.environ.get("WEB_SEARCH_COUNT", "").strip()
+    raw = os.environ.get("BRAVE_SEARCH_COUNT", "").strip()
     if not raw:
         return _DEFAULT_COUNT
     try:
@@ -45,7 +45,7 @@ def _get_count() -> int:
 
 
 def _get_market() -> str:
-    return os.environ.get("WEB_SEARCH_MARKET", _DEFAULT_MARKET).strip() or _DEFAULT_MARKET
+    return os.environ.get("BRAVE_SEARCH_MARKET", _DEFAULT_MARKET).strip() or _DEFAULT_MARKET
 
 
 def is_configured() -> bool:
@@ -62,7 +62,7 @@ async def search(query: str, client: httpx.AsyncClient | None = None) -> WebSear
     """
     api_key = _get_api_key()
     if not api_key:
-        raise RuntimeError("Web search is not configured. Set WEB_SEARCH_API_KEY to enable it.")
+        raise RuntimeError("Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it.")
 
     params: dict[str, str] = {
         "q": query,
@@ -121,7 +121,7 @@ def _parse_response(query: str, data: dict) -> WebSearchResponse:
 
 
 async def execute(ctx: ToolExecutionContext) -> ToolResult:
-    """Execute the web_search tool — called by the tool registry dispatcher."""
+    """Execute the brave_search tool — called by the tool registry dispatcher."""
     from pydantic import ValidationError
 
     try:
@@ -132,24 +132,24 @@ async def execute(ctx: ToolExecutionContext) -> ToolResult:
     if not query:
         query = (ctx.query or "").strip()
     if not query:
-        return ToolResult(tool_id=ctx.tool_id or "web_search", error="web_search requires a query.")
+        return ToolResult(tool_id=ctx.tool_id or "brave_search", error="brave_search requires a query.")
 
     if not is_configured():
         return ToolResult(
-            tool_id=ctx.tool_id or "web_search",
-            error="Web search is not configured. Set WEB_SEARCH_API_KEY to enable it.",
+            tool_id=ctx.tool_id or "brave_search",
+            error="Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it.",
         )
 
     try:
         response = await search(query)
     except Exception as exc:  # pylint: disable=broad-except
         return ToolResult(
-            tool_id=ctx.tool_id or "web_search",
-            error=f"Web search failed: {type(exc).__name__}: {exc}",
+            tool_id=ctx.tool_id or "brave_search",
+            error=f"Brave search failed: {type(exc).__name__}: {exc}",
         )
 
     return ToolResult(
-        tool_id=ctx.tool_id or "web_search",
+        tool_id=ctx.tool_id or "brave_search",
         output_text=render_search_results(response),
         output_json={"response": response.model_dump(mode="json")},
     )

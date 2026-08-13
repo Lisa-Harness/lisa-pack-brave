@@ -4,16 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["lisa_packs*", "lisa_packs.brave_search*"]
+include = ["lisa_packs*", "lisa_packs.brave*"]
 
 [tool.setuptools.package-data]
 "lisa_packs" = ["*"]
-"lisa_packs.brave_search" = ["tools/**/*.yml"]
+"lisa_packs.brave" = ["tools/**/*.yml"]
 
 [project]
-name = "lisa-pack-brave-search"
+name = "lisa-pack-brave"
 version = "0.1.0"
-description = "Lisa Brave search provider pack - concrete web_search tool implementation"
+description = "Lisa Brave search provider pack - concrete brave_search tool implementation"
 requires-python = ">=3.11"
 dependencies = [
     "httpx>=0.27.0",
@@ -28,7 +28,7 @@ dev = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests"]
+testpaths = ["lisa_packs/brave/tests"]
 
 [project.entry-points."lisa.extensions.content_roots"]
-brave-search = "lisa_packs.brave_search:get_content_root"
+brave = "lisa_packs.brave:get_content_root"
