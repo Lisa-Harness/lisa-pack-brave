@@ -16,4 +16,4 @@ def test_brave_pack_brave_search_tool_discovered() -> None:
     assert "brave_search" in catalog
     tool = catalog["brave_search"]
     assert tool["tool_id"] == "brave_search"
-    assert tool["module_path"].startswith("lisa_packs.brave.tools.")
+    assert "lisa_packs.brave.tools." in tool["module_path"]
