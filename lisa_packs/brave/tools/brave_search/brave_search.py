@@ -6,9 +6,9 @@ import os
 from datetime import UTC, datetime
 
 import httpx
+from kernel.models import ToolExecutionContext, ToolResult
 from pydantic import BaseModel, Field
 
-from kernel.models import ToolExecutionContext, ToolResult
 from lisa_packs.brave.models import WebSearchResponse, WebSearchResult
 
 __all__ = ["Parameters", "execute", "is_configured", "search"]
@@ -31,7 +31,10 @@ def _get_api_key() -> str:
 
 
 def _get_endpoint() -> str:
-    return os.environ.get("BRAVE_SEARCH_ENDPOINT", _DEFAULT_ENDPOINT).strip() or _DEFAULT_ENDPOINT
+    return (
+        os.environ.get("BRAVE_SEARCH_ENDPOINT", _DEFAULT_ENDPOINT).strip()
+        or _DEFAULT_ENDPOINT
+    )
 
 
 def _get_count() -> int:
@@ -45,7 +48,10 @@ def _get_count() -> int:
 
 
 def _get_market() -> str:
-    return os.environ.get("BRAVE_SEARCH_MARKET", _DEFAULT_MARKET).strip() or _DEFAULT_MARKET
+    return (
+        os.environ.get("BRAVE_SEARCH_MARKET", _DEFAULT_MARKET).strip()
+        or _DEFAULT_MARKET
+    )
 
 
 def is_configured() -> bool:
@@ -53,7 +59,9 @@ def is_configured() -> bool:
     return bool(_get_api_key())
 
 
-async def search(query: str, client: httpx.AsyncClient | None = None) -> WebSearchResponse:
+async def search(
+    query: str, client: httpx.AsyncClient | None = None
+) -> WebSearchResponse:
     """Execute one Brave Web Search query and return structured results.
 
     Raises:
@@ -62,7 +70,9 @@ async def search(query: str, client: httpx.AsyncClient | None = None) -> WebSear
     """
     api_key = _get_api_key()
     if not api_key:
-        raise RuntimeError("Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it.")
+        raise RuntimeError(
+            "Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it."
+        )
 
     params: dict[str, str] = {
         "q": query,
@@ -132,7 +142,10 @@ async def execute(ctx: ToolExecutionContext) -> ToolResult:
     if not query:
         query = (ctx.query or "").strip()
     if not query:
-        return ToolResult(tool_id=ctx.tool_id or "brave_search", error="brave_search requires a query.")
+        return ToolResult(
+            tool_id=ctx.tool_id or "brave_search",
+            error="brave_search requires a query.",
+        )
 
     if not is_configured():
         return ToolResult(
@@ -142,7 +155,7 @@ async def execute(ctx: ToolExecutionContext) -> ToolResult:
 
     try:
         response = await search(query)
-    except Exception as exc:  # pylint: disable=broad-except
+    except Exception as exc:  # noqa: BLE001  # broad-except is intentional at tool boundary
         return ToolResult(
             tool_id=ctx.tool_id or "brave_search",
             error=f"Brave search failed: {type(exc).__name__}: {exc}",
