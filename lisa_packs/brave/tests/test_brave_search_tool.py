@@ -1,4 +1,4 @@
-"""Tests for the Brave provider brave_search tool contract."""
+"""Tests for the Brave provider web_search tool contract."""
 
 from __future__ import annotations
 
@@ -15,7 +15,7 @@ async def test_brave_search_returns_friendly_error_when_unconfigured(
     monkeypatch.setattr(ws, "is_configured", lambda: False)
 
     ctx = ToolExecutionContext(
-        tool_id="brave_search",
+        tool_id="web_search",
         parameters={"query": "cloud cost"},
     )
     result = await ws.execute(ctx)
@@ -30,10 +30,10 @@ async def test_brave_search_returns_friendly_error_when_unconfigured(
 async def test_brave_search_returns_error_on_empty_query() -> None:
     from lisa_packs.brave.tools.brave_search import brave_search as ws
 
-    ctx = ToolExecutionContext(tool_id="brave_search", parameters={})
+    ctx = ToolExecutionContext(tool_id="web_search", parameters={})
     result = await ws.execute(ctx)
 
-    assert result.error == "brave_search requires a query."
+    assert result.error == "web_search requires a query."
 
 
 @pytest.mark.asyncio
@@ -61,7 +61,7 @@ async def test_brave_search_returns_grounded_payload_when_configured(
     monkeypatch.setattr(ws, "search", _fake_search)
 
     ctx = ToolExecutionContext(
-        tool_id="brave_search",
+        tool_id="web_search",
         parameters={"query": "cloud cost"},
     )
     result = await ws.execute(ctx)
