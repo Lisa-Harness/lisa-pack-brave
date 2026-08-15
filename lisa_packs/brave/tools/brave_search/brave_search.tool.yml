@@ -1,4 +1,5 @@
 tool_id: web_search
 tool_provider_id: lisa-pack-brave
 description: "Search the web using Brave Search and return grounded results."
+effect: read
 exportable: true
