@@ -20,10 +20,7 @@ async def test_brave_search_returns_friendly_error_when_unconfigured(
     )
     result = await ws.execute(ctx)
 
-    assert (
-        result.error
-        == "Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it."
-    )
+    assert result.error == "Brave search is not configured. Set BRAVE_SEARCH_API_KEY to enable it."
 
 
 @pytest.mark.asyncio
@@ -68,7 +65,4 @@ async def test_brave_search_returns_grounded_payload_when_configured(
 
     assert result.error == ""
     assert result.output_json["response"]["query"] == "cloud cost"
-    assert (
-        result.output_json["response"]["results"][0]["url"]
-        == "https://example.com/guardrails"
-    )
+    assert result.output_json["response"]["results"][0]["url"] == "https://example.com/guardrails"
